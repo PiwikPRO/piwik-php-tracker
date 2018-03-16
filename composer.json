@@ -1,0 +1,17 @@
+{
+    "name": "piwikpro/piwik-php-tracker",
+    "description": "PHP Client for Piwik Analytics Tracking API",
+    "keywords": ["piwik","tracker","analytics"],
+    "homepage": "https://piwik.pro",
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "The Piwik Team",
+            "email": "hello@piwik.org",
+            "homepage": "http://piwik.org/the-piwik-team/"
+        }
+    ],
+    "autoload": {
+        "classmap": ["."]
+    }
+}
