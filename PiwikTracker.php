@@ -1649,6 +1649,7 @@ class PiwikTracker
             );
         }
         if (strpos(self::$URL, '/piwik.php') === false
+            && strpos(self::$URL, '/ppms.php') === false
             && strpos(self::$URL, '/proxy-piwik.php') === false
         ) {
             self::$URL .= '/piwik.php';
