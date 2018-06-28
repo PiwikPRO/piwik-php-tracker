@@ -89,7 +89,6 @@ class PiwikTracker
     public function __construct($idSite, $apiUrl = '')
     {
         $this->ecommerceItems = array();
-        $this->attributionInfo = false;
         $this->eventCustomVar = false;
         $this->forcedDatetime = false;
         $this->forcedNewVisit = false;
@@ -221,31 +220,6 @@ class PiwikTracker
     public function setUrlReferer($url)
     {
         $this->setUrlReferrer($url);
-        return $this;
-    }
-
-    /**
-     * Sets the attribution information to the visit, so that subsequent Goal conversions are
-     * properly attributed to the right Referrer URL, timestamp, Campaign Name & Keyword.
-     *
-     * This must be a JSON encoded string that would typically be fetched from the JS API:
-     * piwikTracker.getAttributionInfo() and that you have JSON encoded via JSON2.stringify()
-     *
-     * If you call enableCookies() then these referral attribution values will be set
-     * to the 'ref' first party cookie storing referral information.
-     *
-     * @param string $jsonEncoded JSON encoded array containing Attribution info
-     * @return $this
-     * @throws Exception
-     * @see function getAttributionInfo() in https://github.com/piwik/piwik/blob/master/js/ppms.js
-     */
-    public function setAttributionInfo($jsonEncoded)
-    {
-        $decoded = json_decode($jsonEncoded, $assoc = true);
-        if (!is_array($decoded)) {
-            throw new Exception("setAttributionInfo() is expecting a JSON encoded string, $jsonEncoded given");
-        }
-        $this->attributionInfo = $decoded;
         return $this;
     }
 
@@ -1320,25 +1294,6 @@ class PiwikTracker
     }
 
     /**
-     * Returns the currently assigned Attribution Information stored in a first party cookie.
-     *
-     * This function will only work if the user is initiating the current request, and his cookies
-     * can be read by PHP from the $_COOKIE array.
-     *
-     * @return string JSON Encoded string containing the Referrer information for Goal conversion attribution.
-     *                Will return false if the cookie could not be found
-     * @see ppms.js getAttributionInfo()
-     */
-    public function getAttributionInfo()
-    {
-        if (!empty($this->attributionInfo)) {
-            return json_encode($this->attributionInfo);
-        }
-
-        return $this->getCookieMatchingName('ref');
-    }
-
-    /**
      * Some Tracking API functionality requires express authentication, using either the
      * Super User token_auth, or a user with 'admin' access to the website.
      *
@@ -1720,16 +1675,6 @@ class PiwikTracker
             // unique pageview id
             (!empty($this->idPageview) ? '&pv_id=' . urlencode($this->idPageview) : '') .
 
-            // Attribution information, so that Goal conversions are attributed to the right referrer or campaign
-            // Campaign name
-            (!empty($this->attributionInfo[0]) ? '&_rcn=' . urlencode($this->attributionInfo[0]) : '') .
-            // Campaign keyword
-            (!empty($this->attributionInfo[1]) ? '&_rck=' . urlencode($this->attributionInfo[1]) : '') .
-            // Timestamp at which the referrer was set
-            (!empty($this->attributionInfo[2]) ? '&_refts=' . $this->attributionInfo[2] : '') .
-            // Referrer URL
-            (!empty($this->attributionInfo[3]) ? '&_ref=' . urlencode($this->attributionInfo[3]) : '') .
-
             // custom location info
             (!empty($this->country) ? '&country=' . urlencode($this->country) : '') .
             (!empty($this->region) ? '&region=' . urlencode($this->region) : '') .
@@ -1896,12 +1841,6 @@ class PiwikTracker
 
         if (empty($this->cookieVisitorId)) {
             $this->loadVisitorIdCookie();
-        }
-
-        // Set the 'ref' cookie
-        $attributionInfo = $this->getAttributionInfo();
-        if (!empty($attributionInfo)) {
-            $this->setCookie('ref', $attributionInfo, $this->configReferralCookieTimeout);
         }
 
         // Set the 'ses' cookie
