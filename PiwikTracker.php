@@ -1397,6 +1397,7 @@ class PiwikTracker
      */
     public function disableCookieSupport()
     {
+        $this->randomVisitorId = false;
         $this->configCookiesDisabled = true;
     }
 
