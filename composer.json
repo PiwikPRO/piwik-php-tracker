@@ -1,6 +1,6 @@
 {
     "name": "piwikpro/piwik-php-tracker",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "PHP Client for Piwik Analytics Tracking API",
     "keywords": ["piwik","tracker","analytics"],
     "homepage": "https://piwik.pro",
